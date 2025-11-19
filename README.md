@@ -18,6 +18,31 @@ An n8n workflow that finds websites by platform/keyword, analyzes performance wi
 
 [See more search operator examples](#customization)
 
+## Quick Start
+
+### Import Workflows
+
+**Option A: From URL (Recommended)**
+
+1. In n8n, click **⋮** (three dots menu) → **Import from URL**
+2. Import subworkflows first (paste these URLs one at a time):
+   ```
+   https://raw.githubusercontent.com/simplesapien/n8n-site-performance-analyzer/main/subworkflows/google-serp-urls.json
+   ```
+   ```
+   https://raw.githubusercontent.com/simplesapien/n8n-site-performance-analyzer/main/subworkflows/process-lighthouse-data.json
+   ```
+3. Then import main workflow:
+   ```
+   https://raw.githubusercontent.com/simplesapien/n8n-site-performance-analyzer/main/main-workflow.json
+   ```
+
+**Option B: Download Files**
+
+Download the repo and import via **⋮** → **Import from File** for each JSON.
+
+---
+
 ## Setup
 
 ### Prerequisites
@@ -36,14 +61,14 @@ An n8n workflow that finds websites by platform/keyword, analyzes performance wi
 
 ### Step 2: Custom Search Engine
 
-1. Go to [Programmable Search Engine](https://cse.google.com/all) and click **Add**
+1. Go to [Programmable Search Engine](https://programmablesearchengine.google.com/) and click **Add**
 2. Enter any placeholder site (e.g., `www.example.com`) and click **Create**
 3. Copy your **Search engine ID** (looks like `fc1234567890123456789`)
 4. **Important**: Go to **Setup** > **Basics** > Enable **Search the entire web**
 
 ### Step 3: SimilarWeb (Optional)
 
-**Note**: The workflow includes hard-coded cookies that access SimilarWeb's extension API endpoint[web:51]. This is an undocumented but publicly accessible API used by their free browser extension[web:51]. In practice, these cookies may continue working indefinitely without rate limiting[web:51][web:83].
+**Note**: The workflow includes hard-coded cookies that access SimilarWeb's extension API endpoint. In practice, these cookies may continue working indefinitely without rate limiting.
 
 **If SimilarWeb stops returning data** (unlikely but possible):
 
@@ -53,22 +78,18 @@ An n8n workflow that finds websites by platform/keyword, analyzes performance wi
 4. In **Network** tab, trigger the extension and find `api.similarweb.com` request
 5. Copy **Cookie** from **Request Headers** and update the **SimilarWeb** node in n8n
 
-### Step 4: Import Workflows
+**Alternative**: Remove the SimilarWeb node entirely if you only need performance data.
 
-1. Import subworkflows first:
-   - `subworkflows/process-lighthouse-data.json`
-   - `subworkflows/format-similarweb-response.json`
-2. Import main workflow: `main-workflow.json`
+### Step 4: Configure in n8n
 
-### Step 5: Configure in n8n
-
-1. Create credential: **Generic Credential Type** > **Query Auth**
+1. After importing, nodes with ⚠️ icons need credentials assigned
+2. Create credential: **Generic Credential Type** > **Query Auth**
    - Name: `key`
    - Value: Your Google API key from Step 1
-2. Assign to **PageSpeed Insights** and **Custom Search** nodes
-3. Open **Custom Search** node, find `cx` parameter, replace `YOUR_CX_ID_HERE` with your Search Engine ID
+3. Assign to **PageSpeed Insights** and **Custom Search** nodes
+4. Open **Custom Search** node, find `cx` parameter, replace `YOUR_CX_ID_HERE` with your Search Engine ID from Step 2
 
-### Step 6: Test
+### Step 5: Test
 
 Run the workflow and verify:
 - Google Custom Search returns results
