@@ -48,7 +48,7 @@ Download the repo and import via **⋮** → **Import from File** for each JSON.
 ### Prerequisites
 - Google Cloud account
 - n8n instance
-- SimilarWeb browser extension (Chrome/Firefox) - optional, see note below
+- SimilarWeb browser extension (Chrome/Firefox) – optional, see note below
 
 ### Step 1: Google APIs
 
@@ -68,19 +68,41 @@ Download the repo and import via **⋮** → **Import from File** for each JSON.
 
 ### Step 3: SimilarWeb (Optional)
 
-**Note**: The workflow includes hard-coded cookies that access SimilarWeb's extension API endpoint. In practice, these cookies may continue working indefinitely without rate limiting.
+**Note:** The workflow includes hard-coded cookies for SimilarWeb's extension API endpoint. In practice, these cookies may keep working without rate limiting.
 
-**If SimilarWeb stops returning data** (unlikely but possible):
+**If SimilarWeb stops returning data**:
 
 1. Install [SimilarWeb extension](https://www.similarweb.com/corp/extension/)
-2. Open DevTools (`F12`), go to `chrome://extensions`, enable **Developer mode**
+2. Open DevTools (`F12`) and go to `chrome://extensions`, enable **Developer mode**
 3. Click **Inspect views: service worker** on the SimilarWeb extension
-4. In **Network** tab, trigger the extension and find `api.similarweb.com` request
+4. In **Network** tab, trigger the extension and find a request to `api.similarweb.com`
 5. Copy **Cookie** from **Request Headers** and update the **SimilarWeb** node in n8n
 
-**Alternative**: Remove the SimilarWeb node entirely if you only need performance data.
+**Alternative:** Remove the SimilarWeb node entirely if you only need performance data.
 
-### Step 4: Configure in n8n
+### Step 4: Link Subworkflows (Manual Step)
+
+After importing, you need to manually connect the subworkflows to the main workflow:
+
+1. Open the **main-workflow** in n8n
+2. Find the **Execute Workflow** nodes (should be two):
+   - **Call Google SERP** node
+   - **Call PageSpeed API** node
+3. For each Execute Workflow node:
+   - Click the node
+   - In the **Workflow** dropdown, select the corresponding subworkflow:
+     - For **Call Google SERP**: Select `Google SERP`
+     - For **Call PageSpeed API**: Select `PageSpeed API Call`
+4. **Configure workflow inputs** for the **Call PageSpeed API** node:
+   - After selecting the workflow, go to **Workflow Inputs** section
+   - Set the input mapping to pass data from the previous node:
+     - Field name: `urls` (or as defined in the subworkflow)
+     - Value: `{{ $json.urls }}` (maps the URL data from Google SERP)
+5. Save the workflow
+
+**Why?** Subworkflow references use per-instance IDs which can't be preserved on export. Manual linking and input configuration ensures correct execution.
+
+### Step 5: Configure in n8n
 
 1. After importing, nodes with ⚠️ icons need credentials assigned
 2. Create credential: **Generic Credential Type** > **Query Auth**
@@ -89,7 +111,7 @@ Download the repo and import via **⋮** → **Import from File** for each JSON.
 3. Assign to **PageSpeed Insights** and **Custom Search** nodes
 4. Open **Custom Search** node, find `cx` parameter, replace `YOUR_CX_ID_HERE` with your Search Engine ID from Step 2
 
-### Step 5: Test
+### Step 6: Test
 
 Run the workflow and verify:
 - Google Custom Search returns results
@@ -105,34 +127,35 @@ Default: `sustainable site:myshopify.com`
 **To change**: Edit the `q` parameter in the **Google Custom Search** node.
 
 **Search operators**:
-- `site:domain.com` - Specific domain
-- `intitle:keyword` - Keyword in title
-- `inurl:keyword` - Keyword in URL
-- `-term` - Exclude term
-- `OR` - Either/or matching
-- `"exact phrase"` - Exact match
-- `site:.ca` - Country TLD
+- `site:domain.com` – Specific domain
+- `intitle:keyword` – Keyword in title
+- `inurl:keyword` – Keyword in URL
+- `-term` – Exclude term
+- `OR` – Either/or matching
+- `"exact phrase"` – Exact match
+- `site:.ca` – Country TLD
 
 ### Results Count
 
 Default: 30 results (3 calls × 10 each). Max: 100 total.
 
-Edit loop/pagination logic to change. Note: Processing 30 sites takes 3-5 minutes.
+Edit loop/pagination logic to change. Note: Processing 30 sites takes 3–5 minutes.
 
 ## API Limits
 
 | API | Free Tier | Notes |
 |-----|-----------|-------|
 | Google Custom Search | 100 queries/day | Hard limit |
-| PageSpeed Insights | 25,000 requests/day | Per site audit |
+| PageSpeed Insights   | 25,000 requests/day | Per site audit |
 | SimilarWeb (extension) | Unknown* | *Undocumented endpoint, no observed limits |
 
 ## Troubleshooting
 
-**"Invalid API key"**: Verify key in n8n credentials, check restrictions in Google Cloud Console  
-**"No results"**: Verify `cx` parameter, ensure "Search entire web" enabled  
-**SimilarWeb empty**: Likely working as-is; if needed, refresh cookies (Step 3) or disable node  
-**Slow workflow**: Normal—Lighthouse audits take 5-10s per site
+**"Invalid API key":** Verify key in n8n credentials, check restrictions in Google Cloud Console  
+**"No results":** Verify `cx` parameter, ensure "Search entire web" enabled  
+**"Workflow input missing":** Check Step 4 – ensure workflow inputs are configured in Execute Workflow nodes  
+**SimilarWeb empty:** Likely working as-is; if needed, refresh cookies (Step 3) or disable node  
+**Slow workflow:** Normal—Lighthouse audits take 5–10s per site
 
 ## Contributing
 

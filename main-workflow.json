@@ -1,5 +1,5 @@
 {
-  "name": "Shopify Client Search",
+  "name": "Site Performance + Analyzer",
   "nodes": [
     {
       "parameters": {
@@ -16,42 +16,12 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "6Wl53zPYJoEmCBPY",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/6Wl53zPYJoEmCBPY",
-          "cachedResultName": "PageSpeed API Call"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "url": "={{ $json.urls }}"
-          },
-          "matchingColumns": [
-            "url"
-          ],
-          "schema": [
-            {
-              "id": "url",
-              "displayName": "url",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
         "options": {}
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1536,
+        1552,
         224
       ],
       "id": "46c7e8bf-9121-4f87-9d8d-12179d050c5a",
@@ -100,7 +70,7 @@
       "typeVersion": 2.2,
       "position": [
         1376,
-        80
+        0
       ],
       "id": "9488a6c4-e6ee-40ea-96d6-f2db402ef815",
       "name": "Filter out empty objects"
@@ -113,7 +83,7 @@
       "typeVersion": 1.1,
       "position": [
         1888,
-        80
+        0
       ],
       "id": "3f4e4997-d747-48b8-b14e-6744650e0969",
       "name": "Convert to File"
@@ -156,49 +126,10 @@
       "typeVersion": 4.3,
       "position": [
         1520,
-        80
+        0
       ],
       "id": "bfc58c7c-2187-4ffb-b065-598ba17be109",
       "name": "Get Traffic Stats"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "4FrL6kxfoLoLRhoQ",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/4FrL6kxfoLoLRhoQ",
-          "cachedResultName": "Google SERP"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "any",
-              "displayName": "any",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        880,
-        224
-      ],
-      "id": "8b542671-bcd7-459e-a19d-af5871311d88",
-      "name": "Get Shopify sites via Custom Search API"
     },
     {
       "parameters": {
@@ -209,7 +140,7 @@
       "typeVersion": 2,
       "position": [
         1696,
-        80
+        0
       ],
       "id": "21759da5-1374-47a3-b79e-a9a81fd1ef97",
       "name": "Merge data1"
@@ -224,6 +155,19 @@
       ],
       "id": "a71f8c46-4840-4fd4-b7f3-a48c13cf69b5",
       "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        224
+      ],
+      "id": "8b542671-bcd7-459e-a19d-af5871311d88",
+      "name": "Get URLs via Custom Search API"
     }
   ],
   "pinData": {},
@@ -301,17 +245,6 @@
         ]
       ]
     },
-    "Get Shopify sites via Custom Search API": {
-      "main": [
-        [
-          {
-            "node": "Split Out",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Merge data1": {
       "main": [
         [
@@ -327,7 +260,18 @@
       "main": [
         [
           {
-            "node": "Get Shopify sites via Custom Search API",
+            "node": "Get URLs via Custom Search API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URLs via Custom Search API": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
             "type": "main",
             "index": 0
           }
@@ -339,7 +283,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "aff4e8ea-1699-45af-bbb5-085c581702ee",
+  "versionId": "69c4c0f8-2d5d-4d5f-a15c-d88459e0470e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"
