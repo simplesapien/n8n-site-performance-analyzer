@@ -1,0 +1,290 @@
+{
+  "name": "Google SERP",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -496
+      ],
+      "id": "a00a98ca-58e3-4e58-871a-efabb893578f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "cx",
+              "value": "YOUR_CX_ID_HERE"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            },
+            {
+              "name": "q",
+              "value": "sustainable site:myshopify.com"
+            },
+            {
+              "name": "start",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          },
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "start",
+                    "value": "={{$pageCount * 10 + 1}}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ $pageCount >= 3 }}",
+              "limitPagesFetched": true,
+              "maxRequests": 3
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        128,
+        -496
+      ],
+      "id": "3f4709c8-83ca-48a5-b982-4571d662be9f",
+      "name": "Request Custom Search API",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "vJErJnF3RSSJZ11N",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7cef3bf-b272-4d14-b30f-04778c3c70af",
+              "name": "body.items",
+              "value": "={{ $json.body.items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -496
+      ],
+      "id": "277633c7-aeb7-4e1b-880f-c572ed9fed2a",
+      "name": "Extract URLs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\nconst domains = new Set();\n\nfor (const node of allItems) {\n  // Your data is at body.items, not json.items\n  const items = node.json.body?.items || [];\n  \n  for (const item of items) {\n    if (item.link) {\n      // Extract just the domain (not full URL with path)\n      const match = item.link.match(/^(https?:\\/\\/[^\\/]+)/);\n      if (match) {\n        domains.add(match[1]);\n      }\n    }\n  }\n}\n\nreturn Array.from(domains).map(domain => ({\n  json: { url: domain }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -496
+      ],
+      "id": "51c22bef-b2e9-4224-a0ac-464bef8b50e8",
+      "name": "Get the root URL"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        688,
+        -496
+      ],
+      "id": "870e6651-308b-49d5-b71f-f8e4eb4cccfd",
+      "name": "Loop over all URLs"
+    },
+    {
+      "parameters": {
+        "url": "=https://unshorten.me/json/{{$json.url}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        -480
+      ],
+      "id": "fe4e4bca-f5a0-42ea-8f5f-85c92de3bf30",
+      "name": "Get the re-direct URLs"
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.data)\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -480
+      ],
+      "id": "524b6e4f-0635-46f9-a96b-d74039246f4e",
+      "name": "Parse the previous JSON response into an object"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fbf74bc2-3ea9-499d-a8c0-c3c5af19baf0",
+              "name": "urls",
+              "value": "={{ $json.resolved_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        -480
+      ],
+      "id": "ed90bee2-1141-4fd3-818c-9ac6fc0f8247",
+      "name": "Extract the final URL"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Request Custom Search API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Custom Search API": {
+      "main": [
+        [
+          {
+            "node": "Extract URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract URLs": {
+      "main": [
+        [
+          {
+            "node": "Get the root URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the root URL": {
+      "main": [
+        [
+          {
+            "node": "Loop over all URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over all URLs": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get the re-direct URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the re-direct URLs": {
+      "main": [
+        [
+          {
+            "node": "Parse the previous JSON response into an object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse the previous JSON response into an object": {
+      "main": [
+        [
+          {
+            "node": "Extract the final URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract the final URL": {
+      "main": [
+        [
+          {
+            "node": "Loop over all URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "80c684f3-ce5a-4f2d-8e22-5d844d9dc1fc",
+  "meta": {
+    "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"
+  },
+  "id": "4FrL6kxfoLoLRhoQ",
+  "tags": []
+}

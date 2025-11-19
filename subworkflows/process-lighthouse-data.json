@@ -1,0 +1,371 @@
+{
+  "name": "PageSpeed API Call",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/pagespeedonline/v5/runPagespeed",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        -208
+      ],
+      "id": "2e70ece7-bdb8-4489-9066-aa2d32678c37",
+      "name": "PageSpeed API Call",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "BYYQBWy78VoNPVec",
+          "name": "Bearer Auth account"
+        },
+        "httpQueryAuth": {
+          "id": "vJErJnF3RSSJZ11N",
+          "name": "Query Auth account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8026435c-a3e2-4132-a378-a6b12a71c18d",
+              "name": "lighthouseResult.categories.performance.score",
+              "value": "={{ $('PageSpeed API Call').item.json.lighthouseResult.categories.performance.score }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        -112
+      ],
+      "id": "1f021381-81c8-4b87-9e83-9e72374f51cc",
+      "name": "Pull out the Lighthouse score"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b8c19c03-c777-478d-a66d-4b8cd4a8e6e9",
+              "leftValue": "={{ $json.loadingExperience && $json.loadingExperience.overall_category }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "={{ true }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -304
+      ],
+      "id": "554aff00-6a78-4cf6-8765-dd96dc20b5f3",
+      "name": "Is field data available (i.e. data from real users)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a40762d8-30a8-444e-8182-94e792db540e",
+              "leftValue": "={{ $json.loadingExperience.overall_category }}",
+              "rightValue": "\"FAST\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        -400
+      ],
+      "id": "bd81b679-e297-4658-9cc6-398d3e3604a1",
+      "name": "Does the website already run fast?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "361fca0b-1728-42ea-907a-6fd25d830310",
+              "leftValue": "={{ $json.lighthouseResult.categories.performance.score }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -112
+      ],
+      "id": "bce905d9-2602-4135-8703-40e0c69402bd",
+      "name": "Is the lighthouse score above 60?"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "url"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        -208
+      ],
+      "id": "66547e21-6105-4530-b23c-83153334ac0f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "n8n has an annoying quirk where it always returns something to the main flow, so I'm setting the objects being returned by the false paths as something easily filtered out in the main flow\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        -416
+      ],
+      "typeVersion": 1,
+      "id": "f7e94309-8827-4576-a94c-6fcf169b3444",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// // Get the URL from the loop iteration\n// const url = $('When Executed by Another Workflow').item.json.url;\n\n// // Extract Lighthouse data from current node input\n// const lr = $json.lighthouseResult;\n\n// // Extract LCP data\n// const lcpAudit = lr.audits['largest-contentful-paint'];\n// const lcp_percentile = Math.round(lcpAudit.numericValue);\n// const lcp_score = lcpAudit.score >= 0.9 ? 'FAST' : (lcpAudit.score >= 0.5 ? 'AVERAGE' : 'SLOW');\n\n// // Extract CLS data\n// const clsAudit = lr.audits['cumulative-layout-shift'];\n// const cls_percentile = clsAudit.numericValue;\n// const cls_category = cls_percentile < 0.1 ? 'FAST' : (cls_percentile < 0.25 ? 'AVERAGE' : 'SLOW');\n\n// // Extract TBT (INP equivalent for lab data)\n// const tbtAudit = lr.audits['total-blocking-time'];\n// const inp_percentile = Math.round(tbtAudit.numericValue);\n// const inp_category = inp_percentile < 200 ? 'FAST' : (inp_percentile < 600 ? 'AVERAGE' : 'SLOW');\n\n// // Extract Lighthouse performance score\n// const lighthouse_score = lr.categories.performance.score * 100;\n\n// // Determine overall category from lighthouse score\n// const overall_category = lighthouse_score >= 90 ? 'FAST' : (lighthouse_score >= 50 ? 'AVERAGE' : 'SLOW');\n\n// return {\n//   url: url,\n//   source: \"lighthouse_report\",\n//   lcp_percentile: lcp_percentile,\n//   lcp_score: lcp_score,\n//   inp_percentile: inp_percentile,\n//   inp_category: inp_category,\n//   cls_percentile: cls_percentile,\n//   cls_category: cls_category,\n//   overall_category: overall_category,\n//   lighthouse_score: lighthouse_score\n// };\n\nreturn {\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -16
+      ],
+      "id": "491c3324-d7ad-40e8-bdf5-b92a3a6363c8",
+      "name": "Return the report"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  url: $('When Executed by Another Workflow').item.json.url,\n  source: \"field_data\",\n  lcp_percentile: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,\n  lcp_score: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.category ?? 'no_data',\n  inp_percentile: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile ?? null,\n  inp_category: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.category ?? 'no_data',\n  cls_percentile: ($json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? 0) / 100,\n  cls_category: $json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.category ?? 'no_data',\n  overall_category: $json.loadingExperience?.overall_category ?? 'no_data',\n  lighthouse_score: ($json.lighthouseResult?.categories?.performance?.score ?? 0) * 100\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -304
+      ],
+      "id": "1d696b7c-55e5-4200-a14d-d312aee8cb1c",
+      "name": "Return the report1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -208
+      ],
+      "id": "b825093e-0d76-4233-8fbf-b232649395a1",
+      "name": "Return dummy object"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -496
+      ],
+      "id": "298539a1-a2c5-493e-8955-4e560bd7ce39",
+      "name": "Return dummy object1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "59204409-e1dd-4734-a75b-4a20c795e137",
+      "name": "Return dummy object2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "PageSpeed API Call": {
+      "main": [
+        [
+          {
+            "node": "Is field data available (i.e. data from real users)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return dummy object2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pull out the Lighthouse score": {
+      "main": [
+        [
+          {
+            "node": "Is the lighthouse score above 60?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is field data available (i.e. data from real users)": {
+      "main": [
+        [
+          {
+            "node": "Does the website already run fast?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pull out the Lighthouse score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does the website already run fast?": {
+      "main": [
+        [
+          {
+            "node": "Return dummy object1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return the report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is the lighthouse score above 60?": {
+      "main": [
+        [
+          {
+            "node": "Return dummy object",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return the report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "PageSpeed API Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "201d0c18-07d3-4839-81e4-54ccd15e180b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"
+  },
+  "id": "6Wl53zPYJoEmCBPY",
+  "tags": []
+}

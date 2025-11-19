@@ -1,0 +1,349 @@
+{
+  "name": "Shopify Client Search",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        224
+      ],
+      "id": "e5eab528-227a-4937-b825-92b438505403",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6Wl53zPYJoEmCBPY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/6Wl53zPYJoEmCBPY",
+          "cachedResultName": "PageSpeed API Call"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "url": "={{ $json.urls }}"
+          },
+          "matchingColumns": [
+            "url"
+          ],
+          "schema": [
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1536,
+        224
+      ],
+      "id": "46c7e8bf-9121-4f87-9d8d-12179d050c5a",
+      "name": "Call 'PageSpeed API Call'1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        224
+      ],
+      "id": "5219eec8-3ba4-4259-a080-206b1a23c013",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "543600f8-13f7-4ecc-9c80-565f771edb8d",
+              "leftValue": "={{$json}}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        80
+      ],
+      "id": "9488a6c4-e6ee-40ea-96d6-f2db402ef815",
+      "name": "Filter out empty objects"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1888,
+        80
+      ],
+      "id": "3f4e4997-d747-48b8-b14e-6744650e0969",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        224
+      ],
+      "id": "514ab507-0e02-4964-983a-5cf2ed08017b",
+      "name": "Wait",
+      "webhookId": "ae203896-5f59-4b42-9878-3861c0e455e4"
+    },
+    {
+      "parameters": {
+        "url": "=https://data.similarweb.com/api/v1/data?domain={{ $json.url.replace('https://', '').replace('http://', '').split('/')[0] }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"accept\": \"*/*\",\n  \"accept-encoding\": \"gzip, deflate, br, zstd\",\n  \"accept-language\": \"en-US,en;q=0.9\",\n  \"content-type\": \"application/json\",\n  \"cookie\": \"sgID=cb008a74-9792-4803-6861-e10e1d9c6ccf; sw_extension_installed=1762654763188\",\n  \"priority\": \"u=1, i\",\n  \"sec-fetch-dest\": \"empty\",\n  \"sec-fetch-mode\": \"cors\",\n  \"sec-fetch-site\": \"none\",\n  \"sec-fetch-storage-access\": \"active\",\n  \"sec-gpc\": \"1\",\n  \"user-agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\",\n  \"x-extension-version\": \"6.12.11\",\n  \"cookies\": \"sgID=cb008a74-9792-4803-6861-e10e1d9c6ccf; sw_extension_installed=1762654763188\"\n}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1520,
+        80
+      ],
+      "id": "bfc58c7c-2187-4ffb-b065-598ba17be109",
+      "name": "Get Traffic Stats"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "4FrL6kxfoLoLRhoQ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/4FrL6kxfoLoLRhoQ",
+          "cachedResultName": "Google SERP"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "any",
+              "displayName": "any",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        224
+      ],
+      "id": "8b542671-bcd7-459e-a19d-af5871311d88",
+      "name": "Get Shopify sites via Custom Search API"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the original website data (from loop)\nconst websiteData = $('Filter out empty objects').item.json;\n\n// Get the SimilarWeb data (from HTTP Request)\nconst data = $input.item.json.body;\n\n// Build top countries object dynamically\nconst topCountries = {};\nconst countries = data.TopCountryShares || [];\ncountries.slice(0, 3).forEach(country => {\n  topCountries[country.CountryCode] = country.Value * 100;\n});\n// ... your existing code ...\n\n// Merge everything together\nreturn {\n    // Original data\n    url: websiteData.url,\n    source: websiteData.source,\n    lcp_percentile: websiteData.lcp_percentile,\n    lcp_score: websiteData.lcp_score,\n    inp_percentile: websiteData.inp_percentile,\n    inp_category: websiteData.inp_category,\n    cls_percentile: websiteData.cls_percentile,\n    cls_category: websiteData.cls_category,\n    overall_category: websiteData.overall_category,\n    lighthouse_score: websiteData.lighthouse_score,\n    \n    // Flatten top countries\n    top_country_1_code: Object.keys(topCountries)[0] || null,\n    top_country_1_traffic: Object.values(topCountries)[0] || null,\n    top_country_2_code: Object.keys(topCountries)[1] || null,\n    top_country_2_traffic: Object.values(topCountries)[1] || null,\n    top_country_3_code: Object.keys(topCountries)[2] || null,\n    top_country_3_traffic: Object.values(topCountries)[2] || null,\n    \n    // SimilarWeb metrics\n    monthly_visits: data.Engagments?.Visits || null,\n    bounce_rate: (data.Engagments?.BounceRate || 0) * 100,\n    page_per_visit: data.Engagments?.PagePerVisit || null,\n    time_on_site: data.Engagments?.TimeOnSite \n      ? `${Math.floor(data.Engagments.TimeOnSite / 60)}.${Math.floor(data.Engagments.TimeOnSite) % 60}`\n      : null,\n    \n    // Flatten traffic sources\n    traffic_direct: (data.TrafficSources?.Direct || 0) * 100,\n    traffic_search: (data.TrafficSources?.Search || 0) * 100,\n    traffic_referrals: (data.TrafficSources?.Referrals || 0) * 100,\n    traffic_social: (data.TrafficSources?.Social || 0) * 100\n  }\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        80
+      ],
+      "id": "21759da5-1374-47a3-b79e-a9a81fd1ef97",
+      "name": "Merge data1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        704,
+        224
+      ],
+      "id": "a71f8c46-4840-4fd4-b7f3-a48c13cf69b5",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Filter out empty objects",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'PageSpeed API Call'1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter out empty objects": {
+      "main": [
+        [
+          {
+            "node": "Get Traffic Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Call 'PageSpeed API Call'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Traffic Stats": {
+      "main": [
+        [
+          {
+            "node": "Merge data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shopify sites via Custom Search API": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge data1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Shopify sites via Custom Search API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aff4e8ea-1699-45af-bbb5-085c581702ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"
+  },
+  "id": "FJvs9dhrWhMAEnMF",
+  "tags": []
+}
