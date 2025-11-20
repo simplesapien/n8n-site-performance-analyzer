@@ -11,7 +11,7 @@
           "parameters": [
             {
               "name": "url",
-              "value": "={{ $json.url }}"
+              "value": "={{ $json.urls }}"
             }
           ]
         },
@@ -20,16 +20,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        64,
-        -208
+        -960,
+        192
       ],
-      "id": "2e70ece7-bdb8-4489-9066-aa2d32678c37",
+      "id": "caea6d0b-b882-4c97-8b6f-d63646c98bde",
       "name": "PageSpeed API Call",
       "credentials": {
-        "httpBearerAuth": {
-          "id": "BYYQBWy78VoNPVec",
-          "name": "Bearer Auth account"
-        },
         "httpQueryAuth": {
           "id": "vJErJnF3RSSJZ11N",
           "name": "Query Auth account"
@@ -54,10 +50,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        512,
-        -112
+        -512,
+        288
       ],
-      "id": "1f021381-81c8-4b87-9e83-9e72374f51cc",
+      "id": "711555bf-93cd-4e42-a06d-8e535621bd8d",
       "name": "Pull out the Lighthouse score"
     },
     {
@@ -89,10 +85,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        288,
-        -304
+        -736,
+        96
       ],
-      "id": "554aff00-6a78-4cf6-8765-dd96dc20b5f3",
+      "id": "cd77a44c-6d2c-4106-8243-39b798cb220f",
       "name": "Is field data available (i.e. data from real users)"
     },
     {
@@ -122,10 +118,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        512,
-        -400
+        -512,
+        0
       ],
-      "id": "bd81b679-e297-4658-9cc6-398d3e3604a1",
+      "id": "ebbdce62-5b4b-4f1c-88bc-2c67cd0fe30d",
       "name": "Does the website already run fast?"
     },
     {
@@ -156,10 +152,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        736,
-        -112
+        -288,
+        288
       ],
-      "id": "bce905d9-2602-4135-8703-40e0c69402bd",
+      "id": "1952c597-27dd-4ae7-8753-9641148b5417",
       "name": "Is the lighthouse score above 60?"
     },
     {
@@ -167,7 +163,7 @@
         "workflowInputs": {
           "values": [
             {
-              "name": "url"
+              "name": "urls"
             }
           ]
         }
@@ -175,10 +171,10 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -160,
-        -208
+        -1184,
+        192
       ],
-      "id": "66547e21-6105-4530-b23c-83153334ac0f",
+      "id": "61b9b28f-b36a-497c-8142-37b19c973ea4",
       "name": "When Executed by Another Workflow"
     },
     {
@@ -187,11 +183,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        944,
-        -416
+        -80,
+        -16
       ],
       "typeVersion": 1,
-      "id": "f7e94309-8827-4576-a94c-6fcf169b3444",
+      "id": "f3bcbc6a-4092-4255-82fe-a1dea218f91c",
       "name": "Sticky Note"
     },
     {
@@ -201,23 +197,23 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        960,
-        -16
+        -64,
+        384
       ],
-      "id": "491c3324-d7ad-40e8-bdf5-b92a3a6363c8",
+      "id": "f668b549-1519-4afc-9bd9-cb2db995fb05",
       "name": "Return the report"
     },
     {
       "parameters": {
-        "jsCode": "return {\n  url: $('When Executed by Another Workflow').item.json.url,\n  source: \"field_data\",\n  lcp_percentile: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,\n  lcp_score: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.category ?? 'no_data',\n  inp_percentile: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile ?? null,\n  inp_category: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.category ?? 'no_data',\n  cls_percentile: ($json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? 0) / 100,\n  cls_category: $json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.category ?? 'no_data',\n  overall_category: $json.loadingExperience?.overall_category ?? 'no_data',\n  lighthouse_score: ($json.lighthouseResult?.categories?.performance?.score ?? 0) * 100\n};\n"
+        "jsCode": "return {\n  url: $('When Executed by Another Workflow').item.json.urls,\n  source: \"field_data\",\n  lcp_percentile: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.percentile ?? null,\n  lcp_score: $json.loadingExperience?.metrics?.LARGEST_CONTENTFUL_PAINT_MS?.category ?? 'no_data',\n  inp_percentile: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.percentile ?? null,\n  inp_category: $json.loadingExperience?.metrics?.INTERACTION_TO_NEXT_PAINT?.category ?? 'no_data',\n  cls_percentile: ($json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.percentile ?? 0) / 100,\n  cls_category: $json.loadingExperience?.metrics?.CUMULATIVE_LAYOUT_SHIFT_SCORE?.category ?? 'no_data',\n  overall_category: $json.loadingExperience?.overall_category ?? 'no_data',\n  lighthouse_score: ($json.lighthouseResult?.categories?.performance?.score ?? 0) * 100\n};\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        736,
-        -304
+        -288,
+        96
       ],
-      "id": "1d696b7c-55e5-4200-a14d-d312aee8cb1c",
+      "id": "12776ea7-5925-4863-b911-a60f6af59da6",
       "name": "Return the report1"
     },
     {
@@ -227,10 +223,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        960,
-        -208
+        -64,
+        192
       ],
-      "id": "b825093e-0d76-4233-8fbf-b232649395a1",
+      "id": "3dc5d979-5ff1-45c0-b35b-a94fe974b1f0",
       "name": "Return dummy object"
     },
     {
@@ -240,10 +236,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        736,
-        -496
+        -288,
+        -96
       ],
-      "id": "298539a1-a2c5-493e-8955-4e560bd7ce39",
+      "id": "2a35fef6-e3a9-4466-99c9-1fed1206cfa8",
       "name": "Return dummy object1"
     },
     {
@@ -253,11 +249,25 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        288,
-        -112
+        -736,
+        288
       ],
-      "id": "59204409-e1dd-4734-a75b-4a20c795e137",
+      "id": "82d858e0-edc0-4fb9-b875-5556a7fa9d5a",
       "name": "Return dummy object2"
+    },
+    {
+      "parameters": {
+        "content": "Set your Google Cloud API key here as query auth acct",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "956c3e59-242e-46ee-904d-1869c83f225d",
+      "name": "Sticky Note1"
     }
   ],
   "pinData": {},
@@ -361,7 +371,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c8e49bf4-e327-4755-809d-e98ce3c5d289",
+  "versionId": "08fa4a2d-e1a7-4eec-80d4-bf46d58af33f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"

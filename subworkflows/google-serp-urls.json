@@ -3,25 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "workflowInputs": {
-          "values": [
-            {
-              "name": "any"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -80,
-        -496
-      ],
-      "id": "a00a98ca-58e3-4e58-871a-efabb893578f",
-      "name": "When Executed by Another Workflow"
-    },
-    {
-      "parameters": {
         "url": "https://www.googleapis.com/customsearch/v1",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpQueryAuth",
@@ -30,15 +11,15 @@
           "parameters": [
             {
               "name": "cx",
-              "value": "YOUR_CX_ID_HERE"
+              "value": "YOUR_CX_KEY"
             },
             {
               "name": "num",
-              "value": "10"
+              "value": "5"
             },
             {
               "name": "q",
-              "value": "outdoor apparel site:myshopify.com"
+              "value": "skateboards site:myshopify.com"
             },
             {
               "name": "start",
@@ -73,10 +54,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        128,
-        -496
+        64,
+        -176
       ],
-      "id": "3f4709c8-83ca-48a5-b982-4571d662be9f",
+      "id": "8bff3820-1a74-45fc-9487-6ba7f09d5f08",
       "name": "Request Custom Search API",
       "credentials": {
         "httpQueryAuth": {
@@ -102,10 +83,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        320,
-        -496
+        288,
+        -176
       ],
-      "id": "277633c7-aeb7-4e1b-880f-c572ed9fed2a",
+      "id": "a839e2b0-54cd-483b-80f3-406ac4ca0606",
       "name": "Extract URLs"
     },
     {
@@ -115,51 +96,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        496,
-        -496
+        512,
+        -176
       ],
-      "id": "51c22bef-b2e9-4224-a0ac-464bef8b50e8",
+      "id": "62dcda09-008c-4027-9a16-2d1ab3f4df1d",
       "name": "Get the root URL"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        688,
-        -496
-      ],
-      "id": "870e6651-308b-49d5-b71f-f8e4eb4cccfd",
-      "name": "Loop over all URLs"
-    },
-    {
-      "parameters": {
-        "url": "=https://unshorten.me/json/{{$json.url}}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        912,
-        -480
-      ],
-      "id": "fe4e4bca-f5a0-42ea-8f5f-85c92de3bf30",
-      "name": "Get the re-direct URLs"
-    },
-    {
-      "parameters": {
-        "jsCode": "return JSON.parse($input.first().json.data)\n\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1120,
-        -480
-      ],
-      "id": "524b6e4f-0635-46f9-a96b-d74039246f4e",
-      "name": "Parse the previous JSON response into an object"
     },
     {
       "parameters": {
@@ -168,7 +109,7 @@
             {
               "id": "fbf74bc2-3ea9-499d-a8c0-c3c5af19baf0",
               "name": "urls",
-              "value": "={{ $json.resolved_url }}",
+              "value": "={{ $json.trimmedFinalUrl }}",
               "type": "string"
             }
           ]
@@ -178,26 +119,62 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1344,
-        -480
+        960,
+        -176
       ],
-      "id": "ed90bee2-1141-4fd3-818c-9ac6fc0f8247",
+      "id": "d2b89291-30c8-4148-993f-1634dd5bf8e5",
       "name": "Extract the final URL"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        -176
+      ],
+      "id": "75b35d19-c6f6-4c68-937a-f2b781726116",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "=https://redirect-resolver-1.onrender.com/redirect?url={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        736,
+        -176
+      ],
+      "id": "64aa1ccc-7b45-4216-afdc-892309dc2390",
+      "name": "Resolve redirects"
+    },
+    {
+      "parameters": {
+        "content": "Set your own query auth with Google Cloud API key \n\nand add your own CX key",
+        "height": 96
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "95786e5e-ab15-4fde-b402-12c0a91fc284",
+      "name": "Sticky Note"
     }
   ],
   "pinData": {},
   "connections": {
-    "When Executed by Another Workflow": {
-      "main": [
-        [
-          {
-            "node": "Request Custom Search API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Request Custom Search API": {
       "main": [
         [
@@ -224,52 +201,29 @@
       "main": [
         [
           {
-            "node": "Loop over all URLs",
+            "node": "Resolve redirects",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Loop over all URLs": {
-      "main": [
-        [],
-        [
-          {
-            "node": "Get the re-direct URLs",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get the re-direct URLs": {
+    "When Executed by Another Workflow": {
       "main": [
         [
           {
-            "node": "Parse the previous JSON response into an object",
+            "node": "Request Custom Search API",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Parse the previous JSON response into an object": {
+    "Resolve redirects": {
       "main": [
         [
           {
             "node": "Extract the final URL",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract the final URL": {
-      "main": [
-        [
-          {
-            "node": "Loop over all URLs",
             "type": "main",
             "index": 0
           }
@@ -281,7 +235,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "80c684f3-ce5a-4f2d-8e22-5d844d9dc1fc",
+  "versionId": "5029999f-097f-4d61-a395-ae2d0cd59a70",
   "meta": {
     "instanceId": "caa97ec828044ebe5f6dfa934955be9af1a27616800ca0bafa1f9b4819663c57"
   },
